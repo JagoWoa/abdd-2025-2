@@ -1,0 +1,105 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║             EXAMEN ABDD 2025-2 - PROYECTO COMPLETADO                 ║
+║             Replicación Bidireccional con SymmetricDS                ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+📊 RESULTADO DE LA CALIFICACIÓN AUTOMÁTICA
+═══════════════════════════════════════════════════════════════════════
+
+Estudiante Evaluado:
+  • Nombre: Andrés Cobeña
+  • Cédula: 1313368928
+  • Rama: student/andres_cobena_1313368928
+
+Calificación Arquitectura: 95 / 100 (A - Excelente)
+
+Desglose:
+  ✓ Docker Compose:      30 / 30 pts  (100%)
+  ✓ Contenedores:        25 / 25 pts  (100%)
+  ✓ Bases de Datos:      20 / 20 pts  (100%)
+  △ SymmetricDS:         20 / 25 pts  (80%)
+  ─────────────────────────────────────────
+    TOTAL:               95 / 100 pts (95%)
+
+═══════════════════════════════════════════════════════════════════════
+
+⚡ CALIFICACIÓN AUTOMÁTICA - 1 COMANDO
+═══════════════════════════════════════════════════════════════════════
+
+Comando:
+  ./calificar_todos.sh
+
+Genera:
+  ✓ calificaciones.json  (JSON consolidado)
+  ✓ calificaciones.csv   (CSV para Excel)
+  ✓ RESUMEN.txt          (Resumen legible)
+  ✓ *.log                (Reportes individuales)
+
+Tiempo: ~2-3 minutos por estudiante
+
+═══════════════════════════════════════════════════════════════════════
+
+🎯 SISTEMA DE EVALUACIÓN
+═══════════════════════════════════════════════════════════════════════
+
+Parte 1: ARQUITECTURA (100 pts) - Automático
+  • Docker Compose:   30 pts
+  • Contenedores:     25 pts
+  • Bases de Datos:   20 pts
+  • SymmetricDS:      25 pts
+
+Parte 2: EVIDENCIAS - Manual
+  • 5 capturas de pantalla demostrando replicación
+  • Carpeta evidencias/ en su rama Git
+  • Ver README.md sección "Evidencias de Replicación"
+
+═══════════════════════════════════════════════════════════════════════
+
+📁 ESTRUCTURA DEL PROYECTO
+═══════════════════════════════════════════════════════════════════════
+
+Repositorio: https://github.com/pedrocobe/abdd-2025-2
+
+Rama main:
+  ✓ README.md (enunciado completo)
+  ✓ INSTRUCCIONES_ESTUDIANTE.md
+  ✓ INSTRUCCIONES_PROFESOR.md
+  ✓ FLUJO_GIT.md
+  ✓ calificar_todos.sh (script de calificación)
+  ✓ init-db/ (scripts SQL)
+  ✓ symmetricds/ (plantillas)
+  ✓ docs/ (documentación)
+
+Rama student/andres_cobena_1313368928:
+  ✓ docker-compose.yml (completado)
+  ✓ symmetricds/ (configurado)
+  ⚠ evidencias/ (pendiente)
+
+═══════════════════════════════════════════════════════════════════════
+
+✅ PROYECTO LISTO PARA PRODUCCIÓN
+═══════════════════════════════════════════════════════════════════════
+
+El sistema está completamente funcional y listo para ser usado con
+estudiantes reales.
+
+Características:
+  ✓ Calificación 100% automática de arquitectura
+  ✓ Genera JSON/CSV/TXT/LOG
+  ✓ Procesa múltiples estudiantes en batch
+  ✓ Sistema de evidencias con capturas
+  ✓ Documentación completa
+
+Para usar:
+  1. Compartir repo con estudiantes
+  2. Esperar entregas (ramas student/*)
+  3. Ejecutar: ./calificar_todos.sh
+  4. Revisar evidencias manualmente
+
+═══════════════════════════════════════════════════════════════════════
+
+Fecha: 28 de Enero de 2026
+Versión: 1.0
+Estado: ✅ PRODUCCIÓN
