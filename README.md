@@ -421,11 +421,156 @@ SELECT * FROM products WHERE product_id = 'PROD-TEST-001';
 
 **Formato de entrega**: ZIP con el nombre `apellido_nombre_examen_abdd.zip`
 
+## 📸 Evidencias de Replicación (REQUERIDO)
+
+Además de la arquitectura, debes demostrar que la replicación bidireccional funciona correctamente mediante **capturas de pantalla**.
+
+### Crear carpeta de evidencias
+
+```bash
+mkdir evidencias
+cd evidencias
+```
+
+### Capturas Requeridas
+
+#### 1. Arquitectura Funcionando (`01_arquitectura.png`)
+
+```bash
+docker compose ps
+```
+
+**Captura:** Debe mostrar los 4 contenedores en estado "Up"
+
+#### 2. INSERT: PostgreSQL → MySQL (`02_insert_pg_mysql.png`)
+
+```bash
+# Terminal 1: Conectar a PostgreSQL
+docker exec -it postgres-america psql -U symmetricds -d globalshop
+
+# Insertar un producto
+INSERT INTO products VALUES ('EVIDENCIA-01', 'Producto de Evidencia', 'Demo', 199.99, 'Test replicacion', true, NOW(), NOW());
+
+# Verificar inserción
+SELECT product_id, product_name, base_price FROM products WHERE product_id = 'EVIDENCIA-01';
+```
+
+```bash
+# Terminal 2: Conectar a MySQL y verificar (esperar 10 segundos)
+docker exec -it mysql-europe mysql -u symmetricds -psymmetricds globalshop
+
+# Verificar que se replicó
+SELECT product_id, product_name, base_price FROM products WHERE product_id = 'EVIDENCIA-01';
+```
+
+**Captura:** Mostrar AMBAS terminales mostrando que el dato insertado en PostgreSQL aparece en MySQL
+
+#### 3. INSERT: MySQL → PostgreSQL (`03_insert_mysql_pg.png`)
+
+```bash
+# Terminal 1: Conectar a MySQL
+docker exec -it mysql-europe mysql -u symmetricds -psymmetricds globalshop
+
+# Insertar un cliente
+INSERT INTO customers VALUES ('EVIDENCIA-02', 'test@evidencia.com', 'Cliente Evidencia', 'Ecuador', NOW(), 1, NOW());
+
+# Verificar
+SELECT customer_id, email, full_name FROM customers WHERE customer_id = 'EVIDENCIA-02';
+```
+
+```bash
+# Terminal 2: Conectar a PostgreSQL y verificar (esperar 10 segundos)
+docker exec -it postgres-america psql -U symmetricds -d globalshop
+
+# Verificar que se replicó
+SELECT customer_id, email, full_name FROM customers WHERE customer_id = 'EVIDENCIA-02';
+```
+
+**Captura:** Ambas terminales mostrando la replicación de MySQL a PostgreSQL
+
+#### 4. UPDATE Bidireccional (`04_update.png`)
+
+```bash
+# En PostgreSQL
+UPDATE products SET base_price = 299.99 WHERE product_id = 'EVIDENCIA-01';
+SELECT product_id, base_price FROM products WHERE product_id = 'EVIDENCIA-01';
+```
+
+```bash
+# En MySQL (esperar 10 segundos)
+SELECT product_id, base_price FROM products WHERE product_id = 'EVIDENCIA-01';
+-- Debe mostrar 299.99
+```
+
+**Captura:** Mostrar el UPDATE y la verificación en la otra BD
+
+#### 5. DELETE Bidireccional (`05_delete.png`)
+
+```bash
+# En MySQL
+DELETE FROM customers WHERE customer_id = 'EVIDENCIA-02';
+SELECT COUNT(*) FROM customers WHERE customer_id = 'EVIDENCIA-02';
+-- Debe retornar 0
+```
+
+```bash
+# En PostgreSQL (esperar 10 segundos)
+SELECT COUNT(*) FROM customers WHERE customer_id = 'EVIDENCIA-02';
+-- Debe retornar 0
+```
+
+**Captura:** Mostrar el DELETE y la verificación
+
+### Documentar Evidencias
+
+Crear `evidencias/README.md`:
+
+```markdown
+# Evidencias de Replicación Bidireccional
+
+## Estudiante
+- **Nombre:** [Tu nombre]
+- **Cédula:** [Tu cédula]
+- **Fecha:** [Fecha de pruebas]
+
+## Descripción de Capturas
+
+### 01_arquitectura.png
+Muestra los 4 contenedores corriendo correctamente.
+
+### 02_insert_pg_mysql.png
+Inserción en PostgreSQL replicada a MySQL.
+- Producto ID: EVIDENCIA-01
+- Tiempo de replicación: ~10 segundos
+
+### 03_insert_mysql_pg.png
+Inserción en MySQL replicada a PostgreSQL.
+- Cliente ID: EVIDENCIA-02  
+- Tiempo de replicación: ~10 segundos
+
+### 04_update.png
+Actualización bidireccional funcionando.
+
+### 05_delete.png
+Eliminación bidireccional funcionando.
+
+## Conclusión
+La replicación bidireccional está funcionando correctamente en ambas direcciones.
+```
+
+### Subir Evidencias
+
+```bash
+git add evidencias/
+git commit -m "Add: Evidencias de replicación bidireccional"
+git push origin student/nombre_apellido_cedula
+```
+
 ## 📞 Soporte
 
 Si tienes dudas sobre el enunciado (NO sobre la solución):
 - Revisa la documentación en `docs/`
-- Verifica los logs de Docker: `docker-compose logs`
+- Verifica los logs de Docker: `docker compose logs`
 - Consulta la documentación oficial de SymmetricDS
 
 ## 🏆 ¡Buena Suerte!
