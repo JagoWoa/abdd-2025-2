@@ -24,13 +24,13 @@ Este examen evalúa tu capacidad para configurar una arquitectura de replicació
   - Montar: `./init-db/mysql:/docker-entrypoint-initdb.d`
 
 - ✅ **symmetricds-america**: Nodo SymmetricDS para PostgreSQL
-  - Imagen: `jumpmind/symmetricds:3.14`
+  - Imagen: `jumpmind/symmetricds:3.16`
   - Puerto: `31415`
   - Montar: `./symmetricds/america:/opt/symmetric-ds/engines/america`
   - Debe depender de `postgres-america`
 
 - ✅ **symmetricds-europe**: Nodo SymmetricDS para MySQL
-  - Imagen: `jumpmind/symmetricds:3.14`
+  - Imagen: `jumpmind/symmetricds:3.16`
   - Puerto: `31416`
   - Montar: `./symmetricds/europe:/opt/symmetric-ds/engines/europe`
   - Debe depender de `mysql-europe` y `symmetricds-america`

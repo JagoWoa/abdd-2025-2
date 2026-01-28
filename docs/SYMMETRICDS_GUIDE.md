@@ -142,7 +142,7 @@ services:
 
   # SymmetricDS Nodo América
   symmetricds-america:
-    image: jumpmind/symmetricds:3.14
+    image: jumpmind/symmetricds:3.16
     container_name: symmetricds-america
     environment:
       - SYMMETRIC_HOME=/opt/symmetric-ds
@@ -157,7 +157,7 @@ services:
 
   # SymmetricDS Nodo Europa
   symmetricds-europe:
-    image: jumpmind/symmetricds:3.14
+    image: jumpmind/symmetricds:3.16
     container_name: symmetricds-europe
     environment:
       - SYMMETRIC_HOME=/opt/symmetric-ds

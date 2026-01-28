@@ -3,22 +3,33 @@
 # ============================================
 
 # Docker Compose file (los estudiantes deben crearlo)
-# En rama main NO existe, en ramas student/ SÍ debe estar
 docker-compose.yml
 
-# Logs y reportes de calificación
-*.log
-logs/
-calificacion_*.txt
-resultados/
-*.json
+# ============================================
+# ARCHIVOS SOLO PARA PROFESOR (NO SUBIR A MAIN)
+# ============================================
+calificar_todos.sh
+calificar.sh
+calificar_estudiante.sh
+INSTRUCCIONES_PROFESOR.md
+RESUMEN_*.md
+RESUMEN_*.txt
+FLUJO_GIT.md
+validation/
 
-# Archivos temporales
+# Resultados de calificación
+resultados*/
+*.log
+calificacion_*.txt
+calificaciones.json
+calificaciones.csv
+
+# ============================================
+# ARCHIVOS TEMPORALES Y SISTEMA
+# ============================================
 *.tmp
 *.temp
 tmp/
-
-# Archivos de sistema
 .DS_Store
 Thumbs.db
 *.swp
@@ -30,6 +41,8 @@ Thumbs.db
 .idea/
 *.iml
 
-# Datos de volúmenes Docker (no versionar)
+# Datos de volúmenes Docker
 *-data/
 volumes/
+postgres-data/
+mysql-data/

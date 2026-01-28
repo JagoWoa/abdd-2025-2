@@ -1,4 +1,11 @@
-# Examen Práctico: Replicación Lógica Bidireccional Heterogénea con SymmetricDS
+# 🎓 Examen Práctico: Replicación Lógica Bidireccional Heterogénea con SymmetricDS
+
+> **Asignatura:** Administración de Bases de Datos Distribuidas  
+> **Modalidad:** Examen práctico individual  
+> **Duración:** Según cronograma del curso  
+> **Calificación:** 100 puntos (80 automático + 20 manual)
+
+---
 
 ## 📋 Descripción del Problema
 
@@ -112,140 +119,233 @@ El sistema incluye scripts con datos iniciales:
 - ✅ Documentación completa en `docs/`
 - ✅ Script de calificación automática
 
-### 🎓 LO QUE DEBES HACER (100 puntos)
+### 🎓 LO QUE DEBES HACER (100 puntos = 80 automático + 20 manual)
 
-#### 1. **Crear `docker-compose.yml` desde CERO** (40 puntos)
-**Archivo NO existe, debes crearlo.**
+#### PARTE 1: Arquitectura (80 puntos - Calificación Automática ⚙️)
+
+##### 1.1. **Crear `docker-compose.yml` desde CERO** (25 puntos)
+**Este archivo NO existe, debes crearlo.**
 
 Debe incluir:
 - ✅ Servicio `postgres-america` (PostgreSQL 15)
+  - Puerto: 5432
+  - Usuario: symmetricds
+  - Base de datos: globalshop
+  - Volumen para `init-db/postgres/`
 - ✅ Servicio `mysql-europe` (MySQL 8.0)
-- ✅ Servicio `symmetricds-america` (SymmetricDS 3.14)
-- ✅ Servicio `symmetricds-europe` (SymmetricDS 3.14)
-- ✅ Red compartida
-- ✅ Volúmenes correctamente montados
-- ✅ Puertos expuestos (5432, 3306, 31415, 31416)
-- ✅ Variables de entorno configuradas
+  - Puerto: 3306
+  - Usuario: symmetricds
+  - Base de datos: globalshop
+  - Volumen para `init-db/mysql/`
+- ✅ Servicio `symmetricds-america` (jumpmind/symmetricds:3.16)
+  - Puerto: 31415
+  - Volúmenes para configuración
+- ✅ Servicio `symmetricds-europe` (jumpmind/symmetricds:3.16)
+  - Puerto: 31416
+  - Volúmenes para configuración
+- ✅ Red compartida entre todos los servicios
+- ✅ `depends_on` y `healthcheck` configurados
 
 **Ver ejemplo completo en**: `docs/SYMMETRICDS_GUIDE.md`
 
-#### 2. **Completar configuración América** (30 puntos)
+##### 1.2. **Completar configuración América** (30 puntos)
 
-**Archivo 1**: `symmetricds/america/symmetric.properties`
-- Completar todos los campos marcados con `COMPLETAR`
-- Configurar conexión a PostgreSQL
-- Definir `engine.name`, `group.id`, `external.id`
-- Configurar puerto HTTP (31415)
-- **NO** definir `registration.url` (es el nodo raíz)
+**Archivo 1**: `symmetricds/america/america.properties.main`
+- ⚙️ `engine.name=america`
+- ⚙️ `group.id=america-store`
+- ⚙️ `external.id=001`
+- ⚙️ Conexión PostgreSQL completa
+- ⚙️ `http.port=31415`
+- ⚙️ `sync.url=http://symmetricds-america:31415/sync/america`
+- ⚠️ **NO** definir `registration.url` (es el nodo raíz)
 
-**Archivo 2**: `symmetricds/america/engines/america.properties`
-- Escribir SQL que defina:
-  - Grupos de nodos (sym_node_group)
-  - Enlaces bidireccionales (sym_node_group_link)
-  - 4 Canales (sym_channel)
-  - 4 Triggers (sym_trigger)
-  - 2 Routers (sym_router)
-  - Vinculación triggers-routers (sym_trigger_router)
+**Archivo 2**: `symmetricds/america/engines/america-setup.sql`
+- 📝 SQL INSERT en tablas SymmetricDS:
+  - `sym_node_group` (2 grupos)
+  - `sym_node_group_link` (enlaces bidireccionales)
+  - `sym_channel` (4 canales)
+  - `sym_trigger` (4 triggers para products, inventory, customers, promotions)
+  - `sym_router` (2 routers)
+  - `sym_trigger_router` (vinculaciones)
 
-**Ver SQL completo en**: `docs/SYMMETRICDS_GUIDE.md` sección "Paso 4"
+**Ver SQL completo en**: `docs/SYMMETRICDS_GUIDE.md` sección "Configuración SQL"
 
-#### 3. **Completar configuración Europa** (30 puntos)
+##### 1.3. **Completar configuración Europa** (25 puntos)
 
-**Archivo 1**: `symmetricds/europe/symmetric.properties`
-- Completar todos los campos marcados con `COMPLETAR`
-- Configurar conexión a MySQL
-- Definir `engine.name`, `group.id`, `external.id`
-- Configurar puerto HTTP (31416)
-- **CRÍTICO**: `registration.url` debe apuntar a América
+**Archivo 1**: `symmetricds/europe/europe.properties.main`
+- ⚙️ `engine.name=europe`
+- ⚙️ `group.id=europe-store`
+- ⚙️ `external.id=002`
+- ⚙️ Conexión MySQL completa
+- ⚙️ `http.port=31416`
+- ⚙️ `sync.url=http://symmetricds-europe:31416/sync/europe`
+- ⚠️ **CRÍTICO**: `registration.url=http://symmetricds-america:31415/sync/america`
 
-**Archivo 2**: `symmetricds/europe/engines/europe.properties`
-- Puede estar vacío (configuración se hereda de América)
+**Archivo 2**: `symmetricds/europe/engines/europe-setup.sql`
+- Puede estar vacío (configuración se propaga desde América)
 
-#### 4. **BONUS: Funcionalidad** (+20 puntos)
-Si tu arquitectura funciona correctamente y pasa las pruebas automáticas
+---
+
+#### PARTE 2: Evidencias de Replicación (20 puntos - Calificación Manual 📸)
+
+Crea la carpeta `replication-proofs/` con 4 capturas de pantalla demostrando:
+
+##### 2.1. **INSERT PostgreSQL → MySQL** (5 pts)
+Insertar un producto en PostgreSQL y mostrar que aparece en MySQL
+
+##### 2.2. **INSERT MySQL → PostgreSQL** (5 pts)
+Insertar un cliente en MySQL y mostrar que aparece en PostgreSQL
+
+##### 2.3. **UPDATE Bidireccional** (5 pts)
+Actualizar un registro en una BD y verificar en la otra
+
+##### 2.4. **DELETE Bidireccional** (5 pts)
+Eliminar un registro en una BD y verificar en la otra
+
+**Ver instrucciones detalladas** en la sección "Evidencias de Replicación" más abajo.
 
 ## 📁 Estructura del Proyecto
 
 ```
 examen-abdd-2025-2/
-├── README.md                          # Este archivo
-├── docker-compose.yml                 # ⚠️ CREAR POR EL ESTUDIANTE
-├── init-db/
+├── README.md                              # 📖 Este archivo - LEER PRIMERO
+├── docker-compose.yml                     # ⚠️ CREAR POR TI (25 pts)
+│
+├── init-db/                               # ✅ Proporcionado (NO modificar)
 │   ├── postgres/
-│   │   └── 01-init.sql               # ✅ Proporcionado
+│   │   └── 01-init.sql                   # DDL + datos PostgreSQL
 │   └── mysql/
-│       └── 01-init.sql               # ✅ Proporcionado
-├── symmetricds/
+│       └── 01-init.sql                   # DDL + datos MySQL
+│
+├── symmetricds/                           # ⚠️ COMPLETAR configuraciones
 │   ├── america/
-│   │   ├── symmetric.properties      # ⚠️ CONFIGURAR POR EL ESTUDIANTE
+│   │   ├── america.properties.main       # ⚠️ CONFIGURAR (15 pts)
 │   │   └── engines/
-│   │       └── america.properties    # ⚠️ CONFIGURAR POR EL ESTUDIANTE
+│   │       └── america-setup.sql         # ⚠️ CONFIGURAR (15 pts)
 │   └── europe/
-│       ├── symmetric.properties      # ⚠️ CONFIGURAR POR EL ESTUDIANTE
+│       ├── europe.properties.main        # ⚠️ CONFIGURAR (15 pts)
 │       └── engines/
-│           └── europe.properties     # ⚠️ CONFIGURAR POR EL ESTUDIANTE
-├── validation/
-│   ├── validate.sh                   # ✅ Script principal de validación
-│   ├── test-inserts.sql              # ✅ Tests de INSERT
-│   ├── test-updates.sql              # ✅ Tests de UPDATE
-│   └── test-deletes.sql              # ✅ Tests de DELETE
-└── docs/
-    ├── SYMMETRICDS_GUIDE.md          # ✅ Guía de SymmetricDS
-    └── TROUBLESHOOTING.md            # ✅ Solución de problemas
+│           └── europe-setup.sql          # ✅ Puede estar vacío (10 pts)
+│
+└── docs/                                  # ✅ Documentación de apoyo
+    ├── SYMMETRICDS_GUIDE.md              # Guía completa con ejemplos
+    └── TROUBLESHOOTING.md                # Solución de problemas comunes
 ```
+
+### Archivos que DEBES crear en tu rama:
+- ✅ `docker-compose.yml`
+- ✅ `replication-proofs/` (carpeta con evidencias)
 
 ## 🚀 Instrucciones de Ejecución
 
-### Para el Estudiante
+### Paso a Paso para Estudiantes
 
-**📖 PASO 0: LEER DOCUMENTACIÓN PRIMERO**
+#### 📖 PASO 0: Preparación (15 min)
+
+1. **Leer documentación:**
+   ```bash
+   # Documentación esencial (leer antes de empezar)
+   cat docs/SYMMETRICDS_GUIDE.md        # Guía completa con ejemplos
+   ```
+
+2. **Clonar repositorio:**
+   ```bash
+   git clone https://github.com/pedrocobe/abdd-2025-2.git
+   cd abdd-2025-2
+   ```
+
+3. **Crear tu rama:**
+   ```bash
+   git checkout -b student/tu_nombre_apellido_cedula
+   ```
+
+#### ⚙️ PASO 1: Configurar Arquitectura (60-90 min)
+
+1. **Crear `docker-compose.yml`** desde cero con los 4 servicios
+
+2. **Completar configuraciones SymmetricDS:**
+   - `symmetricds/america/america.properties.main`
+   - `symmetricds/america/engines/america-setup.sql`
+   - `symmetricds/europe/europe.properties.main`
+   - `symmetricds/europe/engines/europe-setup.sql`
+
+3. **Levantar servicios:**
+   ```bash
+   docker compose up -d
+   ```
+
+4. **Verificar contenedores:**
+   ```bash
+   docker compose ps
+   # Debes ver 4 contenedores en estado "Up" o "healthy"
+   ```
+
+5. **Monitorear logs:**
+   ```bash
+   docker compose logs -f
+   # Ctrl+C para salir
+   # Esperar ~60-90 segundos hasta que SymmetricDS esté listo
+   ```
+
+#### 🧪 PASO 2: Probar Replicación (30-45 min)
+
+1. **Conectar a PostgreSQL:**
+   ```bash
+   docker exec -it postgres-america psql -U symmetricds -d globalshop
+   ```
+
+2. **Conectar a MySQL:**
+   ```bash
+   docker exec -it mysql-europe mysql -u symmetricds -psymmetricds globalshop
+   ```
+
+3. **Realizar pruebas** (ver sección "Pruebas Manuales" más abajo)
+
+#### 📸 PASO 3: Capturar Evidencias (20-30 min)
+
+1. **Crear carpeta:**
+   ```bash
+   mkdir replication-proofs
+   ```
+
+2. **Tomar 4 capturas de pantalla** (ver sección "Evidencias de Replicación")
+
+3. **Crear README.md explicativo** en `replication-proofs/`
+
+#### 📤 PASO 4: Entregar (5 min)
+
 ```bash
-# Lee primero estas guías antes de empezar:
-cat docs/SYMMETRICDS_GUIDE.md        # Guía completa con ejemplos
-cat INSTRUCCIONES_ESTUDIANTE.md      # Instrucciones paso a paso
+# Verificar cambios
+git status
+
+# Agregar archivos
+git add docker-compose.yml symmetricds/ replication-proofs/
+
+# Commit
+git commit -m "Solución examen: replicación bidireccional SymmetricDS"
+
+# Push
+git push origin student/tu_nombre_apellido_cedula
 ```
 
-**1. Completar las configuraciones requeridas**
-   - ✅ Crear `docker-compose.yml` (desde cero)
-   - ✅ Completar `symmetricds/america/symmetric.properties`
-   - ✅ Completar `symmetricds/america/engines/america.properties`
-   - ✅ Completar `symmetricds/europe/symmetric.properties`
-   - ✅ Verificar `symmetricds/europe/engines/europe.properties`
+**¡Listo! Tu examen ha sido entregado.**
 
-**2. Levantar la arquitectura**
+---
+
+### 👨‍🏫 Instrucciones para el Profesor
+
+**Calificación automática masiva:**
 ```bash
-docker-compose up -d
+# Desde la rama main, ejecutar:
+./calificar_todos.sh
+
+# Genera automáticamente:
+# - JSON con todas las calificaciones
+# - CSV para importar a Excel
+# - Logs individuales por estudiante
 ```
 
-**3. Verificar que los contenedores están corriendo**
-```bash
-docker-compose ps
-# Debes ver 4 contenedores en estado "Up"
-```
-
-**4. Esperar a que todo inicie (2-3 minutos)**
-```bash
-# Ver logs si hay problemas
-docker-compose logs -f
-```
-
-**5. Probar manualmente (opcional)**
-```bash
-# Ver INSTRUCCIONES_ESTUDIANTE.md para ejemplos de pruebas
-```
-
-**6. Entregar**
-   - ZIP con todos los archivos configurados
-   - Captura de pantalla de `docker-compose ps`
-
-### Para el Profesor
-
-**Calificación Automática en 1 Comando:**
-```bash
-./calificar.sh
-```
-
-El script calificará automáticamente (100 puntos total):
+**Salida:** `resultados_[timestamp]/`
 
 | Sección | Puntos | Qué Valida |
 |---------|--------|------------|
@@ -388,6 +488,86 @@ Debes crear una carpeta `replication-proofs/` en tu rama con capturas que demues
 - **<60**: Insuficiente (F)
 
 **Si no presentas las capturas de replicación, tu calificación máxima será la de arquitectura únicamente.**
+
+## 📦 Entrega del Examen
+
+### Flujo de Trabajo con Git
+
+#### 1️⃣ Clonar el Repositorio
+
+```bash
+git clone https://github.com/pedrocobe/abdd-2025-2.git
+cd abdd-2025-2
+```
+
+#### 2️⃣ Crear tu Rama de Trabajo
+
+**IMPORTANTE:** Nombra tu rama exactamente con este formato:
+
+```bash
+git checkout -b student/nombre_apellido_cedula
+```
+
+**Ejemplo:**
+```bash
+git checkout -b student/juan_perez_1234567890
+```
+
+#### 3️⃣ Realizar tu Implementación
+
+Completa las siguientes tareas en tu rama:
+
+1. **Crear `docker-compose.yml`** con los 4 servicios
+2. **Completar configuraciones** en `symmetricds/`
+3. **Probar la replicación** con las pruebas manuales
+4. **Crear carpeta `replication-proofs/`** con evidencias
+
+#### 4️⃣ Confirmar tus Cambios
+
+```bash
+# Ver cambios
+git status
+
+# Agregar archivos
+git add docker-compose.yml symmetricds/ replication-proofs/
+
+# Commit
+git commit -m "Solución examen: replicación bidireccional SymmetricDS"
+
+# Subir tu rama
+git push origin student/nombre_apellido_cedula
+```
+
+#### 5️⃣ Verificar tu Entrega
+
+Confirma que tu rama esté en GitHub:
+```bash
+git branch -r | grep student/tu_nombre
+```
+
+### 📂 Estructura Final de tu Rama
+
+```
+student/tu_nombre_apellido_cedula/
+├── docker-compose.yml                    ✅ Tu solución (OBLIGATORIO)
+├── symmetricds/                          ✅ Configuraciones completadas
+│   ├── america/
+│   │   ├── america.properties.main       ✅ Configuración nodo América
+│   │   └── engines/
+│   │       └── america-setup.sql         ✅ Setup SQL América
+│   └── europe/
+│       ├── europe.properties.main        ✅ Configuración nodo Europa
+│       └── engines/
+│           └── europe-setup.sql          ✅ Setup SQL Europa
+└── replication-proofs/                   ✅ Evidencias (20 pts)
+    ├── 01_insert_pg_to_mysql.png
+    ├── 02_insert_mysql_to_pg.png
+    ├── 03_update_bidireccional.png
+    ├── 04_delete_bidireccional.png
+    └── README.md                         ✅ Explicación de capturas
+```
+
+---
 
 ## 📚 Recursos y Referencias
 
@@ -600,12 +780,61 @@ student/tu_nombre_apellido_cedula/
     └── README.md
 ```
 
+## ⚖️ Política Académica
+
+### ✅ Permitido
+- Consultar documentación oficial de Docker, PostgreSQL, MySQL y SymmetricDS
+- Usar los archivos en `docs/` como referencia
+- Revisar logs de Docker para debugging
+- Realizar pruebas locales ilimitadas
+
+### ❌ NO Permitido
+- Copiar soluciones de otros estudiantes
+- Compartir tu solución con compañeros
+- Usar soluciones completas de internet sin entender
+- Modificar archivos base en `init-db/`
+
+---
+
 ## 📞 Soporte
 
-Si tienes dudas sobre el enunciado (NO sobre la solución):
-- Revisa la documentación en `docs/`
-- Verifica los logs de Docker: `docker compose logs`
-- Consulta la documentación oficial de SymmetricDS
+### Dudas sobre el Enunciado
+Si tienes preguntas sobre **qué se pide** (NO sobre cómo resolverlo):
+- Contacta al profesor por el canal oficial del curso
+- Horario de consultas según cronograma
+
+### Recursos de Ayuda
+- 📖 `docs/SYMMETRICDS_GUIDE.md` - Conceptos y configuración
+- 🔧 `docs/TROUBLESHOOTING.md` - Problemas comunes
+- 🐳 `docker compose logs` - Ver logs de contenedores
+- 📚 [Documentación oficial SymmetricDS](https://www.symmetricds.org/documentation)
+
+---
+
+## 🎯 Resumen Rápido
+
+### Lo que DEBES hacer:
+1. ✅ Crear `docker-compose.yml` con 4 servicios
+2. ✅ Configurar SymmetricDS en ambos nodos
+3. ✅ Probar replicación bidireccional (INSERT/UPDATE/DELETE)
+4. ✅ Capturar pantallas en `replication-proofs/`
+5. ✅ Hacer commit y push a tu rama `student/nombre_apellido_cedula`
+
+### Lo que YA está hecho:
+- ✅ DDL de bases de datos (`init-db/`)
+- ✅ Datos iniciales de prueba
+- ✅ Estructura de carpetas
+- ✅ Documentación de apoyo
+
+### Calificación:
+- **80 pts (automático):** Arquitectura Docker + Configuración SymmetricDS
+- **20 pts (manual):** Evidencias de replicación en capturas
+
+---
+
+## 📄 Licencia
+
+Este material es propiedad académica y su uso está restringido al contexto educativo del curso.
 
 ## 🏆 ¡Buena Suerte!
 
